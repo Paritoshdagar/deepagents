@@ -1,0 +1,330 @@
+Project Brief
+
+Enterprise Proactive Agent for Microsoft 365 + Azure + GCP
+
+⸻1. Product Vision
+
+Build a proactive enterprise AI agent that operates inside:
+	•	Microsoft Teams
+	•	Outlook
+	•	Microsoft 365 ecosystem
+	•	Azure
+	•	Google Cloud Platform (GCP)
+
+The system:
+	•	Acts like a digital operations employee
+	•	Executes real tasks (not just drafts messages)
+	•	Works inside existing enterprise workflows
+	•	Is safe, governed, auditable
+	•	Runs in a hardened enterprise environment
+
+This is not a chatbot.
+This is an enterprise execution layer with a conversational interface.
+
+⸻
+
+2. Strategic Positioning
+
+Instead of being a general OpenClaw-style system with hundreds of integrations, this product is:
+
+“The Enterprise Operations Agent for Microsoft-centric organizations.”
+
+That focus gives you:
+	•	Faster security approval
+	•	Cleaner architecture
+	•	Better enterprise story
+	•	Reduced attack surface
+	•	Faster MVP delivery
+
+⸻
+
+3. Core Scope (Phase 1)
+
+A. User Interface Layer
+
+Primary interaction channels:
+
+1. Microsoft Teams
+	•	Teams Bot application
+	•	App-level permissions
+	•	Channel and private chat support
+	•	Adaptive Cards for approvals
+	•	Proactive notifications
+
+2. Outlook
+	•	Outlook add-in
+	•	Email triage + draft replies
+	•	Calendar automation
+	•	Meeting summaries
+	•	Trigger-based execution (VIP emails, keywords, escalations)
+
+⸻
+
+4. Core Integrations
+
+A. Microsoft 365 (Primary Domain)
+
+Use Microsoft Graph API as the backbone.
+
+Capabilities:
+	•	Mail read/send
+	•	Calendar read/write
+	•	SharePoint document access
+	•	OneDrive
+	•	Planner
+	•	To Do
+	•	Teams messages
+	•	Directory (Azure AD / Entra ID)
+
+Security Model:
+	•	OAuth with delegated permissions
+	•	Per-user consent model
+	•	Least-privilege scopes
+	•	Admin-controlled permission policies
+
+⸻
+
+B. Microsoft Azure Integration
+
+Agent capabilities:
+	•	Read resource inventory
+	•	Monitor alerts
+	•	Create support tickets
+	•	Summarize cost usage
+	•	Generate reports
+	•	Trigger automation runbooks
+	•	Execute approved scripts (sandboxed)
+
+Access via:
+	•	Azure AD service principals
+	•	Managed identities
+	•	Scoped RBAC roles
+	•	Subscription-level access control
+
+⸻
+
+C. Google Cloud Platform Integration
+
+Capabilities:
+	•	View projects
+	•	Monitor alerts
+	•	Query billing summaries
+	•	Trigger Cloud Functions
+	•	Execute automation via Pub/Sub
+	•	Manage IAM reports (read-only initially)
+
+Access via:
+	•	GCP service accounts
+	•	Workload identity federation
+	•	IAM-scoped permissions
+	•	Per-project isolation
+
+⸻
+
+5. Architectural Design
+
+A. Core Components
+	1.	Channel Adapters
+	•	Teams bot service
+	•	Outlook add-in backend
+	•	Webhook event processor
+	2.	Agent Orchestrator
+	•	Planning loop
+	•	Tool selection
+	•	Execution verification
+	•	Retry handling
+	3.	Policy Engine
+	•	Risk scoring
+	•	Approval rules
+	•	Scope enforcement
+	•	Data classification policies
+	4.	Execution Sandbox
+	•	Containerized execution
+	•	No direct production network access
+	•	Egress allowlist
+	•	Audit logging
+	5.	Cloud Connectors
+	•	Azure connector module
+	•	GCP connector module
+	•	Microsoft Graph connector
+	6.	Audit + Observability
+	•	Immutable action log
+	•	SIEM export
+	•	Execution replay mode
+	•	Per-user trace history
+
+⸻
+
+6. Proactive Agent Design
+
+This is the key differentiator.
+
+The system must not wait for prompts. It should:
+
+Trigger Conditions
+	•	New high-priority email
+	•	Cloud alert
+	•	Cost spike
+	•	SLA breach
+	•	Security incident
+	•	Calendar conflict
+	•	Unanswered customer email
+
+Behavior Model
+
+Tier 1 – Suggest
+	•	Draft response
+	•	Summarize issue
+	•	Propose action
+
+Tier 2 – Auto-Execute (Low Risk)
+	•	Tag emails
+	•	Schedule tentative meetings
+	•	Create internal tickets
+	•	Notify relevant teams
+
+Tier 3 – Approval Required
+	•	Send external emails
+	•	Modify cloud infrastructure
+	•	Delete resources
+	•	Close security alerts
+	•	Change IAM policies
+
+⸻
+
+7. Security Model (Enterprise-Grade)
+
+A. Identity
+	•	Azure AD as primary IdP
+	•	Conditional access policies
+	•	Device trust enforcement
+	•	SCIM provisioning
+	•	Role-based access control
+
+⸻
+
+B. Least Privilege Everywhere
+	•	Per-tenant isolation
+	•	Per-user access scopes
+	•	No global admin mode
+	•	Time-bound tokens
+	•	Scoped service principals
+
+⸻
+
+C. Prompt Injection Mitigation
+	•	Label all external email content as untrusted
+	•	Strip executable instructions from emails
+	•	Tool invocation schema validation
+	•	Context segmentation (system vs user vs external data)
+	•	Two-layer planning system:
+	•	Model A interprets input
+	•	Model B executes tool plans
+
+⸻
+
+D. Cloud Safety Controls
+
+For Azure and GCP:
+	•	Read-only default mode
+	•	Change freeze windows
+	•	Action budgets
+	•	Dual approval for destructive actions
+	•	IAM modification lock
+	•	Activity anomaly detection
+
+⸻
+
+E. Skill / Extension Model (Future Phase)
+
+Do NOT open third-party plugin marketplace at launch.
+
+Phase 1:
+	•	First-party tools only.
+
+Phase 2:
+	•	Signed extensions
+	•	Capability manifest
+	•	Isolated execution
+	•	Manual enterprise approval
+
+⸻
+
+8. Deployment Model
+
+Enterprise Hosting Options
+
+Option 1 – Customer Azure Subscription
+	•	Runs in customer tenant
+	•	Uses managed identity
+	•	Customer-controlled keys
+
+Option 2 – Managed SaaS
+	•	Dedicated VNet per customer
+	•	Tenant-isolated database
+	•	Customer-managed encryption keys
+
+Never run on employee laptops.
+
+⸻
+
+9. Governance & Compliance
+
+Must include:
+	•	Full audit log export
+	•	Action trace replay
+	•	Data residency configuration
+	•	GDPR compliance
+	•	SOC2 readiness
+	•	Retention policies
+	•	Legal hold mode
+
+⸻
+
+10. MVP Feature List
+
+Teams
+	•	Chat-based task execution
+	•	Proactive cloud alert summaries
+	•	Approval cards
+
+Outlook
+	•	Inbox triage
+	•	Draft responses
+	•	Calendar management
+	•	Automated follow-ups
+
+Azure
+	•	Alert triage
+	•	Cost reports
+	•	Runbook execution (approved)
+
+GCP
+	•	Billing reports
+	•	Alert summarization
+	•	Triggered automation workflows
+
+⸻
+
+11. Acceptance Criteria
+
+The system is ready when:
+	•	No destructive cloud action can occur without approval
+	•	Every action has an audit trail
+	•	Agent cannot access resources beyond assigned scopes
+	•	Emails cannot inject system-level instructions
+	•	Enterprise admin can disable any tool
+	•	Tenant isolation is cryptographically enforced
+
+⸻
+
+12. Strategic Advantage
+
+By narrowing to Microsoft 365 + Azure + GCP:
+
+You get:
+	•	Immediate enterprise relevance
+	•	Strong governance narrative
+	•	Reduced attack surface
+	•	Faster procurement acceptance
+	•	Clear differentiation from generic agent frameworks

@@ -1,0 +1,179 @@
+# tool-registry.yaml
+# Canonical tool inventory and authorization metadata.
+# Runtime policy engine should resolve each tool call against this registry.
+
+version: "1.0"
+registry_id: "default-tool-registry"
+default_decision: "deny"
+updated_at: "2026-02-28T00:00:00Z"
+
+required_tool_fields:
+  - "name"
+  - "description"
+  - "owner"
+  - "risk_tier"
+  - "reversible"
+  - "data_classification"
+  - "allowed_roles"
+  - "requires_approval"
+  - "input_schema"
+  - "output_schema"
+  - "audit"
+
+tools:
+  - name: "read_file"
+    description: "Read file contents"
+    owner: "deepagents-core"
+    risk_tier: "T0"
+    reversible: true
+    data_classification: "internal"
+    allowed_roles:
+      - "manager_employee"
+      - "specialist_employee"
+    requires_approval: false
+    input_schema:
+      type: "object"
+      required: ["file_path"]
+      properties:
+        file_path: { type: "string" }
+        offset: { type: "integer" }
+        limit: { type: "integer" }
+    output_schema:
+      type: "string"
+    audit:
+      log_args_hash: true
+      log_result_hash: true
+
+  - name: "write_file"
+    description: "Create new file"
+    owner: "deepagents-core"
+    risk_tier: "T2"
+    reversible: true
+    data_classification: "internal"
+    allowed_roles:
+      - "manager_employee"
+      - "specialist_employee"
+    requires_approval: "conditional"
+    input_schema:
+      type: "object"
+      required: ["file_path", "content"]
+      properties:
+        file_path: { type: "string" }
+        content: { type: "string" }
+    output_schema:
+      type: "object"
+    audit:
+      log_args_hash: true
+      log_result_hash: true
+
+  - name: "edit_file"
+    description: "Edit existing file"
+    owner: "deepagents-core"
+    risk_tier: "T2"
+    reversible: true
+    data_classification: "internal"
+    allowed_roles:
+      - "manager_employee"
+      - "specialist_employee"
+    requires_approval: "conditional"
+    input_schema:
+      type: "object"
+      required: ["file_path", "old_string", "new_string"]
+      properties:
+        file_path: { type: "string" }
+        old_string: { type: "string" }
+        new_string: { type: "string" }
+        replace_all: { type: "boolean" }
+    output_schema:
+      type: "object"
+    audit:
+      log_args_hash: true
+      log_result_hash: true
+
+  - name: "execute"
+    description: "Run shell command"
+    owner: "deepagents-core"
+    risk_tier: "T3"
+    reversible: false
+    data_classification: "restricted"
+    allowed_roles:
+      - "manager_employee"
+    requires_approval: true
+    input_schema:
+      type: "object"
+      required: ["command"]
+      properties:
+        command: { type: "string" }
+        timeout: { type: "integer" }
+    output_schema:
+      type: "object"
+    constraints:
+      require_command_allowlist: true
+      block_network_egress_by_default: true
+      sandbox_required: true
+    audit:
+      log_args_hash: true
+      log_result_hash: true
+      include_exit_code: true
+
+  - name: "memory_search"
+    description: "Search long-term memory"
+    owner: "memory-platform"
+    risk_tier: "T1"
+    reversible: true
+    data_classification: "internal"
+    allowed_roles:
+      - "manager_employee"
+      - "specialist_employee"
+    requires_approval: false
+    input_schema:
+      type: "object"
+      required: ["query", "org_id"]
+      properties:
+        query: { type: "string" }
+        org_id: { type: "string" }
+        user_id: { type: "string" }
+        memory_class: { type: "string" }
+    output_schema:
+      type: "array"
+    audit:
+      log_args_hash: true
+      log_result_hash: false
+
+  - name: "memory_write"
+    description: "Persist memory item"
+    owner: "memory-platform"
+    risk_tier: "T2"
+    reversible: true
+    data_classification: "restricted"
+    allowed_roles:
+      - "manager_employee"
+      - "specialist_employee"
+    requires_approval: "conditional"
+    input_schema:
+      type: "object"
+      required: ["org_id", "memory_class", "subject_type", "subject_id", "content"]
+      properties:
+        org_id: { type: "string" }
+        memory_class: { type: "string" }
+        subject_type: { type: "string" }
+        subject_id: { type: "string" }
+        content: { type: "string" }
+        source_trace_id: { type: "string" }
+        expiration_date: { type: "string" }
+    output_schema:
+      type: "object"
+    constraints:
+      enforce_memory_class_permissions: true
+      pii_scan_required: true
+    audit:
+      log_args_hash: true
+      log_result_hash: true
+
+bindings:
+  policy_file: "./policy.yaml"
+  tier_defaults:
+    T0: { decision: "allow" }
+    T1: { decision: "allow" }
+    T2: { decision: "allow_with_policy" }
+    T3: { decision: "interrupt_required" }

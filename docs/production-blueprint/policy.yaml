@@ -1,0 +1,162 @@
+# policy.yaml
+# Production policy contract for AI employees / AI organization runtime.
+# This file is intended as both a schema-like template and a deployable starter config.
+
+version: "1.0"
+policy_id: "org-default-policy"
+owner: "platform-security"
+default_mode: "deny_by_default"
+updated_at: "2026-02-28T00:00:00Z"
+
+organization:
+  org_id_required: true
+  environment: "production"
+  tenant_isolation: "strict"
+
+identity:
+  require_user_id: true
+  require_employee_id: true
+  require_trace_id: true
+
+risk_tiers:
+  T0:
+    description: "Read-only or informational actions"
+    requires_approval: false
+    max_impact: "none"
+  T1:
+    description: "Low-risk reversible internal actions"
+    requires_approval: false
+    max_impact: "low"
+  T2:
+    description: "Moderate-risk internal writes"
+    requires_approval: "conditional"
+    max_impact: "medium"
+  T3:
+    description: "High-risk, external, or irreversible actions"
+    requires_approval: true
+    max_impact: "high"
+
+role_policies:
+  platform_owner:
+    max_autonomy_tier: "T3"
+    can_override: true
+  org_admin:
+    max_autonomy_tier: "T2"
+    can_override: false
+  manager_employee:
+    max_autonomy_tier: "T1"
+    can_override: false
+  specialist_employee:
+    max_autonomy_tier: "T1"
+    can_override: false
+
+approval:
+  enabled: true
+  require_reason_on_reject: true
+  allow_edit_before_approve: true
+  default_allowed_decisions:
+    - "approve"
+    - "edit"
+    - "reject"
+  escalation:
+    t3_dual_control: false
+    timeout_seconds: 1800
+    on_timeout: "reject"
+
+policy_decision_points:
+  input_boundary:
+    enabled: true
+    enforce_prompt_injection_checks: true
+    enforce_pii_redaction: true
+  tool_boundary:
+    enabled: true
+    require_registry_entry: true
+    deny_unregistered_tools: true
+  output_boundary:
+    enabled: true
+    validate_schema: true
+    redact_sensitive_content: true
+  memory_boundary:
+    enabled: true
+    require_memory_class: true
+    enforce_class_permissions: true
+
+memory:
+  classes:
+    policy_memory:
+      mutable_by:
+        - "platform_owner"
+      retention_days: 3650
+      pii_allowed: false
+    org_memory:
+      mutable_by:
+        - "org_admin"
+      retention_days: 1095
+      pii_allowed: false
+    user_memory:
+      mutable_by:
+        - "org_admin"
+        - "manager_employee"
+        - "specialist_employee"
+      retention_days: 365
+      pii_allowed: true
+    session_state:
+      mutable_by:
+        - "manager_employee"
+        - "specialist_employee"
+      retention_days: 14
+      pii_allowed: true
+
+safety:
+  block_credential_patterns: true
+  block_cross_tenant_data_exposure: true
+  enforce_least_privilege: true
+  max_tool_calls_per_turn: 20
+  max_recursion_depth: 100
+
+observability:
+  audit_log:
+    enabled: true
+    immutable: true
+    required_fields:
+      - "trace_id"
+      - "org_id"
+      - "employee_id"
+      - "user_id"
+      - "tool_name"
+      - "decision"
+      - "reason_code"
+      - "timestamp"
+  metrics:
+    - "request_latency_p95"
+    - "tool_failure_rate"
+    - "policy_deny_rate"
+    - "approval_turnaround_seconds"
+    - "high_risk_false_allow_rate"
+
+release_gates:
+  gate_0_tests:
+    required: true
+  gate_1_safety_evals:
+    required: true
+    min_pass_rate: 0.95
+  gate_2_trace_grading:
+    required: true
+    min_pass_rate: 0.95
+  gate_3_canary:
+    required: true
+  gate_4_rollback_verified:
+    required: true
+
+incident_controls:
+  kill_switch:
+    global: true
+    per_org: true
+    per_tool: true
+  severity:
+    SEV1:
+      response: "immediate_containment"
+    SEV2:
+      response: "contain_within_1h"
+    SEV3:
+      response: "sprint_fix"
